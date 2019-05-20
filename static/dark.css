@@ -1,0 +1,50 @@
+body {color: white; background-color: black;}
+body::selection {background: white;}
+
+
+
+
+a{color: blue;}
+a:visited {color: gray;}
+a:hover {color: gray;}
+a:visited:hover {color: gray;}
+
+.secret {color: black;}
+.mainlink{font-size: 18px;}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 20%;
+  padding: 10px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@font-face {
+    font-family: 'kindergartenmedium';
+    src: url('kindergarten-webfont.woff2') format('woff2'),
+         url('kindergarten-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+	font-family: 'Diablo Heavy';
+	font-style: normal;
+	font-weight: normal;
+	src: local('Diablo Heavy'), url('diablo.woff') format('woff');
+}
+
+
+ 
