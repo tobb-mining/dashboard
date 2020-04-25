@@ -27,3 +27,9 @@ class LoginForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired()])
 	remember = BooleanField('Remember me')
 	submit = SubmitField('Login')
+
+
+class TagForm(FlaskForm):
+	key = StringField('Tag Name', validators=[DataRequired()])
+	value = PasswordField('Values', validators=[DataRequired()])
+	submit = SubmitField('Submit Tag')

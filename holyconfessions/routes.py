@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, Response
 from holyconfessions import app, bcrypt
-from holyconfessions.forms import RegistrationForm, LoginForm
-from holyconfessions.models import User, Post
+from holyconfessions.forms import RegistrationForm, LoginForm, TagForm
+from holyconfessions.models import User, Post, Tag
 from flask_login import login_user, current_user, logout_user
 from holyconfessions import db
 
@@ -106,12 +106,33 @@ def dashboard():
 
 
 
-@app.route('/bar')
-def bar():
+@app.route('/chart')
+def chart():
 	labels.append('TEST')
 	values.append(100)
 	return render_template('chart.html', title='Bitcoin Monthly Price in USD', max=17000, labels=labels, values=values)
 
 
 
+@app.route('/submit_tag', methods=['GET', 'POST'])
+def submit_tag():
+	form = TagForm()
+	if form.validate_on_submit():
+		tag = Tag(username=current_user.username, key=form.key.data, value=form.value.data)
+		db.session.add(tag)
+		db.session.commit()
+		flash('{} adli tag olusturuldu.'.format(form.key.data), 'success')
+		return redirect(url_for('tags'))
+	return render_template('submit_tag.html', title='Submit Tag', form=form)	
 
+
+@app.route('/tags')
+def tags():
+	my_tags = Tag.query.filter_by(username=current_user.username)
+	tags = []
+	for tag in my_tags:
+		tag_block = {}
+		tag_block['key'] = tag.key
+		tag_block['value'] = tag.value
+		tags.append(tag_block)
+	return render_template('tags.html', tags=tags)

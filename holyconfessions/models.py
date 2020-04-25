@@ -17,6 +17,11 @@ class User(db.Model, UserMixin):
 	def __repr__(self):
 		return "User('{}', '{}')".format(self.username, self.email)
 
+	@property
+	def username(self):
+		return self.username
+
+
 
 class Post(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -27,3 +32,10 @@ class Post(db.Model):
 
 	def __repr__(self):
 		return "User('{}', '{}')".format(self.title, self.date_posted)
+
+
+class Tag(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	username = db.Column(db.String(100), nullable=False)
+	key = db.Column(db.String(100), nullable=False)
+	value = db.Column(db.String(100), nullable=False)

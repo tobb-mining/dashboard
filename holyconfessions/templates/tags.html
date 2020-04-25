@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+	{% for tag in tags %}
+		<h1>{{tag.key}}</h1>
+		<p>{{tag.value}}</p>
+	{% endfor %}
+{% endblock %}
