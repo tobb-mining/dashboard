@@ -1,9 +1,15 @@
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, Response
 from holyconfessions import app, bcrypt
 from holyconfessions.forms import RegistrationForm, LoginForm
 from holyconfessions.models import User, Post
 from flask_login import login_user, current_user, logout_user
 from holyconfessions import db
+
+import random
+import time
+import json
+from datetime import datetime
+
 
 posts = [
 	{
@@ -18,6 +24,20 @@ posts = [
 	}
 	
 ]
+
+
+labels = [
+	'JAN', 'FEB', 'MAR', 'APR',
+	'MAY', 'JUN', 'JUL', 'AUG',
+	'SEP', 'OCT', 'NOV', 'DEC'
+]
+
+values = [
+	967.67, 1190.89, 1079.75, 1349.19,
+	2328.91, 2504.28, 2873.83, 4764.87,
+	4349.29, 6458.30, 9907, 16297
+]
+
 
 
 
@@ -68,3 +88,30 @@ def login():
 def logout():
 	logout_user()
 	return redirect(url_for('home'))
+
+
+
+# This is a self-reloading example without <meta http-equiv="refresh" content="5">
+@app.route('/dashboard')
+def dashboard():
+	def generate_random_data():
+		while True:
+			json_data = json.dumps(
+				{'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'value': random.random() * 100})
+			yield f"data:{json_data}\n\n"
+			time.sleep(1)
+
+	return Response(generate_random_data(), mimetype='text/event-stream')
+
+
+
+
+@app.route('/bar')
+def bar():
+	labels.append('TEST')
+	values.append(100)
+	return render_template('chart.html', title='Bitcoin Monthly Price in USD', max=17000, labels=labels, values=values)
+
+
+
+
