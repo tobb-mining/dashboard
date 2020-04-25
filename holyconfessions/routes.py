@@ -1,6 +1,6 @@
-from flask import render_template, url_for, flash, redirect, Response
+from flask import render_template, url_for, flash, redirect, Response, request
 from holyconfessions import app, bcrypt
-from holyconfessions.forms import RegistrationForm, LoginForm, TagForm
+from holyconfessions.forms import RegistrationForm, LoginForm, TagForm, SelectDimensionsForm
 from holyconfessions.models import User, Post, Tag
 from flask_login import login_user, current_user, logout_user
 from holyconfessions import db
@@ -27,9 +27,9 @@ posts = [
 
 
 labels = [
-	'JAN', 'FEB', 'MAR', 'APR',
-	'MAY', 'JUN', 'JUL', 'AUG',
-	'SEP', 'OCT', 'NOV', 'DEC'
+	'OCA', 'ŞUB', 'MAR', 'NİS',
+	'MAY', 'HAZ', 'TEM', 'AĞU',
+	'EYL', 'EKİ', 'KAS', 'ARA'
 ]
 
 values = [
@@ -92,8 +92,8 @@ def logout():
 
 
 # This is a self-reloading example without <meta http-equiv="refresh" content="5">
-@app.route('/dashboard')
-def dashboard():
+@app.route('/stream')
+def stream():
 	def generate_random_data():
 		while True:
 			json_data = json.dumps(
@@ -105,20 +105,11 @@ def dashboard():
 
 
 
-
-@app.route('/chart')
-def chart():
-	labels.append('TEST')
-	values.append(100)
-	return render_template('chart.html', title='Bitcoin Monthly Price in USD', max=17000, labels=labels, values=values)
-
-
-
 @app.route('/submit_tag', methods=['GET', 'POST'])
 def submit_tag():
 	form = TagForm()
 	if form.validate_on_submit():
-		tag = Tag(username=current_user.username, key=form.key.data, value=form.value.data)
+		tag = Tag(username=current_user.usernamee, key=form.key.data, value=form.value.data)
 		db.session.add(tag)
 		db.session.commit()
 		flash('{} adli tag olusturuldu.'.format(form.key.data), 'success')
@@ -126,13 +117,52 @@ def submit_tag():
 	return render_template('submit_tag.html', title='Submit Tag', form=form)	
 
 
-@app.route('/tags')
+@app.route('/tags', methods=['GET', 'POST'])
 def tags():
-	my_tags = Tag.query.filter_by(username=current_user.username)
+	form = SelectDimensionsForm()
+	user_tags = Tag.query.filter_by(username=current_user.usernamee)
+	groups_list=[(tag.key, tag.key) for tag in user_tags]
+	form.key1.choices = groups_list
+	form.key2.choices = groups_list
+
+	if form.validate_on_submit():
+		tag1 = form.key1.data
+		tag2 = form.key2.data
+		return redirect(url_for('dashboard', tag1=tag1, tag2=tag2))
+
+	my_tags = Tag.query.filter_by(username=current_user.usernamee)
+	return render_template('select_tags.html', form=form)
+	'''
 	tags = []
 	for tag in my_tags:
 		tag_block = {}
 		tag_block['key'] = tag.key
 		tag_block['value'] = tag.value
 		tags.append(tag_block)
-	return render_template('tags.html', tags=tags)
+	'''
+	
+
+
+
+@app.route('/dashboard')
+def dashboard():
+	# tag1 = Tag.query.filter_by(key=tag1).first()
+	# tag2 = Tag.query.filter_by(key=tag2).first()
+	labels.append('TEST')
+	values.append(100)
+	return render_template('dashboard.html', title='Veriler', max=17000, labels=labels, values=values)	
+
+
+
+@app.route('/test', methods=['GET','POST'])
+def test():
+	 if request.method == "POST":
+	 	data = request.json["data"]
+	 	print(data)
+	 	return Response("hey")
+	 return render_template('test.html')
+
+
+@app.route('/ajaxtest', methods=['GET','POST'])
+def ajaxtest():
+	return render_template('ajaxhtml.html')

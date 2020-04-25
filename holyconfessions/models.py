@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
 		return "User('{}', '{}')".format(self.username, self.email)
 
 	@property
-	def username(self):
+	def usernamee(self):
 		return self.username
 
 

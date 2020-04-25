@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from holyconfessions.models import User
 
@@ -33,3 +33,9 @@ class TagForm(FlaskForm):
 	key = StringField('Tag Name', validators=[DataRequired()])
 	value = PasswordField('Values', validators=[DataRequired()])
 	submit = SubmitField('Submit Tag')
+
+
+class SelectDimensionsForm(FlaskForm):
+	key1 = SelectField(u'Key1', validators=[DataRequired()])
+	key2 = SelectField(u'Key2', validators=[DataRequired()])
+	submit = SubmitField('Go To Dashboard')

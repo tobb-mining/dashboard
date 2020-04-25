@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+
+<form action="/contact" id="contact-form" method="POST" enctype="text/plain">
+    <div class="row" id="first">
+        <div class="col-md-4">
+            <label>Tag</label>
+        </div>
+        <div class="col-md-4">
+            <label>Value</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" class="tag1" name="tag1"/>
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="value1" name="value1"/>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="addRow()">+</button>
+    <button type="button" class="btn btn-dark" id="add">Send</button>
+</form>
+<div id="form-response"></div>
+
+
+<script>
+    counter = 2
+    function addRow(){
+        var row = document.createElement("div");
+        row.className = "row";
+
+        var tag = document.createElement("div");
+        tag.className = "col-md-4";
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.className = "tag" + counter;
+        inp.name = "tag" + counter;
+        tag.appendChild(inp);
+        row.appendChild(tag);
+
+        var value = document.createElement("div");
+        value.className = "col-md-4";
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.className = "value" + counter;
+        inp.name = "value" + counter;
+        value.appendChild(inp);
+        row.appendChild(value);
+
+
+
+
+
+        var form = document.getElementById("contact-form");
+        form.appendChild(row);
+
+        counter += 1        
+    }
+
+    var data = {'data':'hey'};
+
+$("#add").click(function(){
+    $.ajax({
+      type : 'POST',
+      url : "{{url_for('test')}}",
+      contentType: 'application/json;charset=UTF-8',
+      data : JSON.stringify(data, null, '\t') 
+    });
+});
+
+
+
+
+
+
+</script>
+
+{% endblock %}
