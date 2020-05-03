@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, Response, request
+from flask import render_template, url_for, flash, redirect, Response, request, jsonify
 from holyconfessions import app, bcrypt
 from holyconfessions.forms import RegistrationForm, LoginForm, TagForm, SelectDimensionsForm
 from holyconfessions.models import User, Post, Tag
@@ -156,13 +156,18 @@ def dashboard():
 
 @app.route('/test', methods=['GET','POST'])
 def test():
-	 if request.method == "POST":
-	 	data = request.json["data"]
-	 	print(data)
-	 	return Response("hey")
+
 	 return render_template('test.html')
 
 
-@app.route('/ajaxtest', methods=['GET','POST'])
+@app.route('/ajaxtest', methods=['GET', 'POST'])
 def ajaxtest():
+	if request.method == "POST":
+	 	data = request.json
+	 	filters = data['filters']
+	 	fields = data['fields']
+	 	print(filters)
+	 	print(fields)
+	 	test_json = {'categories': ['Shopping', 'Restaurant', 'Hardware Store'], 'values': [20, 25, 5]}
+	 	return jsonify(test_json)
 	return render_template('ajaxhtml.html')

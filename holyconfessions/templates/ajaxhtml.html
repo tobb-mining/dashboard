@@ -1,33 +1,256 @@
 {% extends "layout.html" %}
 
+{% block head %}
+
+<meta charset="utf-8" />
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js'></script>
+
+
+<style>
+
+.label{
+    font-size: 30px;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #555;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modalBtn {
+    position:absolute;
+    transition: .5s ease;
+    top: 0%;
+    left: 0%;
+}
+.modalBtn:hover { 
+    -webkit-transform: scale(1.15);/*Grows in size like Angry Birds button*/
+    -moz-transform: scale(1.15);
+    -ms-transform: scale(1.15);
+    -o-transform: scale(1.15);
+}
+
+
+.chartGrid{
+    grid-template-columns: auto auto;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+
+.item {
+  border: 1px solid #f00;
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+
+
+</style>
+
+{% endblock %}
+
 
 {% block content %}
 
-<form action="/contact" id="contact-form" method="POST" enctype="text/plain">
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <span style="font-size:30px;cursor:pointer" onclick="openFilterNav()">&#9776; Filters</span>
+    <span style="font-size:30px;cursor:pointer" onclick="openChartNav()">&#9776; Chart Fields</span>
+    <br>
+    <select id="cars">
+      <option value="pie-chart">Pie Chart</option>
+      <option value="line-chart">Line Chart</option>
+      <option value="bar-chart">Bar Chart</option>
+      <option value="doughnut">Doughnut</option>
+    </select>
+    <br>
+    <button type="button" class="btn btn-dark" id="add">Get Chart</button>
+  </div>
+
+</div>
+
+
+
+<div id="chartFilterSidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeFilterNav()">&times;</a>
     <div class="row" id="first">
         <div class="col-md-4">
-            <label>Tag</label>
+            <label class="label">Tag</label>
         </div>
         <div class="col-md-4">
-            <label>Value</label>
+            <label class="label">Value</label>
         </div>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <input type="text" class="tag1" name="tag1"/>
+            <input type="text" class="tag1" name="tag1" id="tag1"/>
         </div>
         <div class="col-md-4">
-            <input type="text" class="value1" name="value1"/>
+            <input type="text" class="value1" name="value1" id="value1"/>
         </div>
     </div>
     <button type="button" class="btn btn-primary" onclick="addRow()">+</button>
-    <button type="button" class="btn btn-dark" id="add">Send</button>
-</form>
-<div id="form-response"></div>
+    
+  <a href="javascript:void(0)" onclick="closeFilterNav()">&times;</a>
+</div>
+
+
+<div id="chartOptionsSidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeChartNav()">&times;</a>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="label">Field</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" class="field1" id="field1">
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="addChartFieldRow()">+</button>
+    <a href="javascript:void(0)" onclick="closeChartNav()">&times;</a>
+</div>
+
+
+<div class="row">
+    <button id="myBtn" class="modalBtn">Add new widget</button>
+</div>
+<br>
+<br>
+
+
+  <div class="row chartGrid">
+    <div class="col-md-auto item">
+      <canvas id="pieChart1" width="300" height="200"></canvas>
+    </div>
+    <div class="col-md-auto item">
+      <canvas id="pieChart2" width="300" height="200"></canvas>
+    </div>
+    <div class="col-md-auto item">
+      <canvas id="pieChart3" width="300" height="200"></canvas>
+    </div>
+  </div>
+  <div class="row chartGrid">
+    <div class="col-md-auto item">
+      <canvas id="pieChart4" width="300" height="200"></canvas>
+    </div>
+    <div class="col-md-auto item">
+      <canvas id="pieChart5" width="300" height="200"></canvas>
+    </div>
+    <div class="col-md-auto item">
+      <canvas id="pieChart6" width="300" height="200"></canvas>
+    </div>
+  </div>
+
+
+
+
 
 
 <script>
-    counter = 2
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+
+    filterCounter = 1
+    fieldCounter = 1
+    chartCounter = 1
+    chartTotal = 6
     function addRow(){
         var row = document.createElement("div");
         row.className = "row";
@@ -36,8 +259,9 @@
         tag.className = "col-md-4";
         var inp = document.createElement("input");
         inp.type = "text";
-        inp.className = "tag" + counter;
-        inp.name = "tag" + counter;
+        inp.className = "tag" + filterCounter;
+        inp.id = "tag" + filterCounter;
+        inp.name = "tag" + filterCounter;
         tag.appendChild(inp);
         row.appendChild(tag);
 
@@ -45,33 +269,172 @@
         value.className = "col-md-4";
         var inp = document.createElement("input");
         inp.type = "text";
-        inp.className = "value" + counter;
-        inp.name = "value" + counter;
+        inp.className = "value" + filterCounter;
+        inp.id = "value" + filterCounter
+        inp.name = "value" + filterCounter;
         value.appendChild(inp);
         row.appendChild(value);
 
 
-
-
-
-        var form = document.getElementById("contact-form");
+        var form = document.getElementById("chartFilterSidenav");
         form.appendChild(row);
 
-        counter += 1        
+        filterCounter += 1        
     }
 
-    var data = {'data':'hey'};
+
+    function addChartFieldRow(){
+        var row = document.createElement("div");
+        row.className = "row";
+
+        var tag = document.createElement("div");
+        tag.className = "col-md-4";
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.className = "chart-field" + fieldCounter;
+        inp.name = "field" + fieldCounter;
+        inp.id = "field" + fieldCounter;
+        tag.appendChild(inp);
+        row.appendChild(tag);
+
+        var form = document.getElementById("chartOptionsSidenav");
+        form.appendChild(row);
+
+        fieldCounter += 1
+
+    }
+
+
+    for(var i = 1; i<=chartTotal; i++){
+       document.getElementById("pieChart"+i).style.visibility = "hidden"; 
+    }
+
+    //var data = {'data':'hey'};
 
 $("#add").click(function(){
+    var data = {};
+    data['filters'] = [];
+    for (var i = 1; i <= filterCounter; i++) {
+        block = {}
+        block['tag'] = document.getElementById("tag"+filterCounter).value;
+        block['value'] = document.getElementById("value"+filterCounter).value;
+        data['filters'].push(block)
+    }
+
+
+    data['fields'] = [];
+    for(var i = 1; i <= fieldCounter; i++){
+        field = document.getElementById("field"+filterCounter).value;
+        data['fields'].push(field)     
+    }
+
+
     $.ajax({
       type : 'POST',
-      url : "{{url_for('test')}}",
+      url : "{{url_for('ajaxtest')}}",
       contentType: 'application/json;charset=UTF-8',
       data : JSON.stringify(data, null, '\t') 
+    }).done(function(test_json){
+
+
+        document.getElementById("pieChart"+chartCounter).style.visibility = "visible";
+        labels = [];
+        data = [];
+        bgColors = [];
+        for(var i = 0; i < test_json['categories'].length; i++){
+            labels.push(test_json['categories'][i]);
+            data.push(test_json['values'][i]);
+            bgColors.push(getRandomColor());
+        }
+
+        var canvas = document.getElementById("pieChart"+chartCounter);
+        var ctx = canvas.getContext('2d');
+
+        // Global Options:
+         Chart.defaults.global.defaultFontColor = 'black';
+         Chart.defaults.global.defaultFontSize = 16;
+
+        var data = {
+            labels: labels,
+              datasets: [
+                {
+                    fill: true,
+                    backgroundColor: bgColors,
+                    data: data,
+        // Notice the borderColor 
+                    borderColor:    ['black', 'black', 'black'],
+                    borderWidth: [2,2,2]
+                }
+            ]
+        };
+
+        // Notice the rotation from the documentation.
+
+        var options = {
+                title: {
+                          display: true,
+                          text: 'categories',
+                          position: 'top'
+                      },
+                rotation: -0.7 * Math.PI
+        };
+
+
+        // Chart declaration:
+        var varPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: data,
+            options: options
+        });
+
+    chartCounter += 1
     });
 });
 
 
+function openFilterNav() {
+  document.getElementById("chartFilterSidenav").style.width = "500px";
+}
+
+function closeFilterNav() {
+  document.getElementById("chartFilterSidenav").style.width = "0";
+}
+
+function openChartNav() {
+  document.getElementById("chartOptionsSidenav").style.width = "250px";
+}
+
+function closeChartNav() {
+  document.getElementById("chartOptionsSidenav").style.width = "0";
+}
+
+
+
+
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
 
 
 
